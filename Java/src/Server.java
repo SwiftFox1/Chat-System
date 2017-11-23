@@ -1,7 +1,6 @@
 //Chat System (Server)
-//Running SwiftProtocol v1.06
 //Written By Ethan Rowan
-//June 2017
+//June-October 2017
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -16,6 +15,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import javax.swing.*;
@@ -25,7 +27,7 @@ import net.miginfocom.swing.MigLayout;
 public class Server extends JFrame
 {
 	String title = "SwiftChat";
-	String version = "v1.06";
+	String version = "v1.1";
 			
 	int port = 5555;
 	String[] data;    //The data is information received by each
@@ -55,6 +57,9 @@ public class Server extends JFrame
 	//that is displayed in the JLists of the UI.
 	DefaultListModel<String> usersModel;
 	DefaultListModel<String> adminModel;
+	//Logs the chat window slightly differently than what is displayed.
+	//This can be chosen to be saved or destroyed when the server is closed.
+	StringBuilder chatlog;
 	
 	//UI Objects
 	private JPanel contentPane;
@@ -86,6 +91,7 @@ public class Server extends JFrame
 		clientIDs = new HashMap<Integer, Integer>();
 		users = new HashMap();
 		usercolor = new HashMap();
+		chatlog = new StringBuilder();
 	}
 	
    //A listener is created for each client so that the
@@ -104,7 +110,8 @@ public class Server extends JFrame
 			this.writer = writer;
 			this.clientID = clientID;
 			clientSockets.add(clientSocket);
-			try {
+			try
+			{
 				reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			} 
 			catch (IOException e)
@@ -123,232 +130,310 @@ public class Server extends JFrame
 				{				
 					try
 					{
-					data = stream.split(ds);
-					for (int i = 0; i < data.length; i++) consoleArea.append("Data recieved: " + data[i] + "\n");
-					
-					//A connect messaage will add a specified user to the
-					//server's cache, and notify all other connected users.
-					if (data[0].equals("connect"))
-					{
-						try
+						data = stream.split(ds);
+						
+						for (int i = 0; i < data.length; i++)
+							consoleArea.append("Data recieved: " + data[i] + "\n");
+						
+						//A connect messaage will add a specified user to the
+						//server's cache, and notify all other connected users.
+						if (data[0].equals("connect"))
 						{
-							//FORMAT: connect÷username÷password
-							//INDEX:     0       1         2
-							ArrayList<String> banlist = readFileToList("bans.list");
-							if (users.containsKey(data[1]))
+							try
 							{
-								//FORMAT: error÷action÷message
-								//INDEX:     0     1      2
-								writer.println("error" + ds + "disconnect" + ds + "Invalid Username");
-								writer.flush();
-								clientOutputStreams.get(clientID).close();
-								clientSocket.close();
-								clientIDs.remove(clientID);
-							}
-							if (banlist.contains(data[1]))
-							{
-								writer.println("error" + ds + "disconnect" + ds + "You are banned from this server");
-								writer.flush();
-								clientOutputStreams.get(clientID).close();
-								clientSocket.close();
-								clientIDs.remove(clientID);
-							}
-							else
-							{
-								ArrayList<String> usernamesList = readAccountsList("username");
-								ArrayList<String> passwordsList = readAccountsList("password");
-							
-								if (usernamesList.contains(data[1]) &&
-										passwordsList.contains(data[2]) &&
-										(usernamesList.indexOf(data[1])) == (passwordsList.indexOf(data[2])))
+								//FORMAT: connect÷username÷password
+								//INDEX:     0       1         2
+								ArrayList<String> banlist = readFileToList("bans.list");
+								if (users.containsKey(data[1]))
 								{
-									if (!users.containsKey(data[2]))
+									//Force disconnects the user if they have an invalid username.
+									writer.println("error" + ds + "disconnect" + ds + "Invalid Username");
+									writer.flush();
+									clientOutputStreams.get(clientID).close();
+									clientSocket.close();
+									clientIDs.remove(clientID);
+								}
+								if (banlist.contains(data[1]))
+								{
+									//Force disconnects the user if they are banned.
+									writer.println("error" + ds + "disconnect" + ds + "You are banned from this server");
+									writer.flush();
+									clientOutputStreams.get(clientID).close();
+									clientSocket.close();
+									clientIDs.remove(clientID);
+								}
+								else
+								{
+									//Grabs the latest username and password lists from the local file.
+									ArrayList<String> usernamesList = readAccountsList("username");
+									ArrayList<String> passwordsList = readAccountsList("password");
+								
+									//Compares the credentials to the main accounts file.
+									if (usernamesList.contains(data[1]) &&
+											passwordsList.contains(data[2]) &&
+											(usernamesList.indexOf(data[1])) == (passwordsList.indexOf(data[2])))
 									{
-										//Successful
-										users.put(data[1], clientID);
-										users.put(clientID, data[1]);
-										usercolor.put(data[1], "black");
-										usersModel.addElement(data[1]);
-										if (data[1].equals("null") == false) 
-											broadcast("connect" + ds + users.get(clientID));
-										if (isAdmin(data[1])) addAdmin(data[1]);
+										if (!users.containsKey(data[2]))
+										{
+											//Successful connects the user if their credentials match.
+											users.put(data[1], clientID);
+											users.put(clientID, data[1]);
+											usercolor.put(data[1], "black");
+											usersModel.addElement(data[1]);
+											if (data[1].equals("null") == false)
+											{
+												broadcast("connect" + ds + users.get(clientID));
+												chatlog.append("[" + getTime() + "]  -" + 
+												users.get(clientID) + " connected to the server-\n");
+											}
+											if (isAdmin(data[1]))
+												addAdmin(data[1]);
+										}
+										else
+										{
+											//Force disconnects the user if their account 
+											//is already in use by another client.
+											writer.println("error" + ds + "disconnect" + ds + "Account in use");
+											writer.flush();
+											clientOutputStreams.get(clientID).close();
+											clientSocket.close();
+											clientIDs.remove(clientID);
+										}
 									}
 									else
 									{
-										//Account in use
-										writer.println("error" + ds + "disconnect" + ds + "Account in use");
+										//Force disconnects the user if they have invalid credentials.
+										writer.println("error" + ds + "disconnect" + ds + "Incorrect login");
 										writer.flush();
 										clientOutputStreams.get(clientID).close();
 										clientSocket.close();
 										clientIDs.remove(clientID);
 									}
 								}
-								else
-								{
-									//Incorrect login
-									writer.println("error" + ds + "disconnect" + ds + "Incorrect login");
-									writer.flush();
-									clientOutputStreams.get(clientID).close();
-									clientSocket.close();
-									clientIDs.remove(clientID);
-								}
+							}
+							catch (Exception e)
+							{
+								//Force disconnects the user if anything at all goes wrong in this process.
+								//The most common case of this error is if the user's client is modified or outdated.
+								writer.println("error" + ds + "disconnect" + ds + 
+										"Internal error. Check your client version");
+								writer.flush();
+								clientOutputStreams.get(clientID).close();
+								clientSocket.close();
+								clientIDs.remove(clientID);
 							}
 						}
-						catch (Exception e)
+						if (data[0].equals("disconnect") && isConnected)
 						{
-							writer.println("error" + ds + "disconnect" + ds + 
-									"Internal error. Check your client version");
-							writer.flush();
+							//FORMAT: disconnect÷username
+							//INDEX:       0        1
+							if (data[1].equals("null") == false)
+							{
+								broadcast("disconnect" + ds + "</font>" + users.get(clientID));
+								chatlog.append("[" + getTime() + "]  -" + 
+										users.get(clientID) + " disconnected from the server-\n");
+							}
+							clientIDs.remove(clientID);
 							clientOutputStreams.get(clientID).close();
 							clientSocket.close();
-							clientIDs.remove(clientID);
+							users.remove(data[1]);
+							users.remove(clientID);
+							usercolor.remove(data[1]);
+							usersModel.removeElement(data[1]);
+							if (isAdmin(data[1]))
+								adminModel.removeElement(data[1]);
+							break;
 						}
-					}
-					if (data[0].equals("disconnect") && isConnected)
-					{
-						//FORMAT: disconnect÷username
-						//INDEX:       0        1
-						if (data[1].equals("null") == false) 
-							broadcast("disconnect" + ds + "</font>" + users.get(clientID));
-						clientIDs.remove(clientID);
-						clientOutputStreams.get(clientID).close();
-						clientSocket.close();
-						users.remove(data[1]);
-						users.remove(clientID);
-						usercolor.remove(data[1]);
-						usersModel.removeElement(data[1]);
-						if (isAdmin(data[1])) adminModel.removeElement(data[1]);
-						break;
-					}
-					//Any data that is sent from one endpoint to
-					//another is considered a "chat" message.
-					if (data[0].equals("chat"))
-					{
-						//FORMAT: chat÷username÷message
-						//INDEX:    0      1       2
-						if (data[2].startsWith("/"))
+						//Any user communication data that is sent from one
+						//endpoint to another is considered a "chat" message.
+						if (data[0].equals("chat"))
 						{
-							String[] args = data[2].split(" ");
-							for (int i = 0; i < args.length; i++)
-								consoleArea.append("Data recieved: " + args[i] + "\n");
-							
-							//ADMIN COMMANDS
-							if (checkAdminCommands(clientID, args));
-							
-							//NON-ADMIN COMMANDS
-							else if (checkNonAdminCommands(clientID, args));
-							
-							//SHARED COMMANDS
-							else if (checkSharedCommands(clientID, args));
-							
-							else pmUser(clientID, "<font color = red>Invalid command.</font>");
-						}
-						else
-						{
-							for (int i = 0; i < readFileToList("filterwords.list").size(); i++)
+							//FORMAT: chat÷username÷message
+							//INDEX:    0      1       2
+							if (users.containsKey(data[1]))
 							{
-								if (data[2].contains(readFileToList("filterwords.list").get(i)))
+								if (data[2].startsWith("/"))
 								{
-									String word = readFileToList("filterwords.list").get(i);
-									String newword = "";
-									for (int t = 0; t < word.length(); t++) newword += "*";
-									int index = data[2].indexOf(word);
-									data[2] = data[2].substring(0, index) + newword + 
-											data[2].substring(index + word.length(), data[2].length());
-								}
-							}
-							
-							if (data[2].contains("<font color"))
-							{
-								broadcast("chat" + ds + "(" + getUserPrefix(data[1]) + 
-										") </font><font color = " + usercolor.get(data[1]) + ">" + 
-										data[1] + ds + "</font>" + data[2] + "</font>");
-							}
-							else
-							{
-								broadcast("chat" + ds + "(" + getUserPrefix(data[1]) + ") </font><font color = " + 
-										usercolor.get(data[1]) + ">" + data[1] + ds + 
-										"</font><font color = black>" + data[2] + "</font>");
-							}
-						}
-					}
-					//A request can be made from the client when it needs
-					//data, for example when signing up and loging in.
-					if (data[0].equals("request"))
-					{
-						//FORMAT: request÷type÷username÷password
-						//INDEX:    0      1      2         3
-						if (data[1].equals("signup"))
-						{
-							File file = new File("accounts.list");
-							if (!file.exists()) file.createNewFile();
-							
-							BufferedReader filereader = new BufferedReader(new FileReader(file));
-							String line = "", accounts = "";
-							while ((line = filereader.readLine()) != null)
-							{
-								accounts += line + "\n";
-							}
-							filereader.close();
-							
-							ArrayList<String> usernamesList = readAccountsList("username");
-							if (usernamesList.contains(data[2]))
-							{
-								writer.println("response" + ds + "signup" + ds + "Username is taken");
-								writer.flush();
-							}
-							
-							else
-							{	
-								BufferedWriter filewriter = new BufferedWriter(new FileWriter(file));
-								filewriter.write(accounts + data[2] + "  " + data[3] + "  " + "notadmin  " + "\n");
-								filewriter.close();
-								
-								writer.println("response" + ds + "signup" + ds + "Account Created");
-								writer.flush();
-							}
-						}
-						else if (data[1].equals("login"))
-						{
-							ArrayList<String> usernamesList = readAccountsList("username");
-							ArrayList<String> passwordsList = readAccountsList("password");
-							
-							if (usernamesList.contains(data[2]) &&
-									passwordsList.contains(data[3]) &&
-									(usernamesList.indexOf(data[2])) == (passwordsList.indexOf(data[3])))
-							{
-								if (!users.containsKey(data[2]))
-								{
-									writer.println("response" + ds + "login" + ds + "Success");
-									writer.flush();
-									consoleArea.append("Sent response success to client " + clientID + ". \n");
+									//Debug info that displays the
+									//exact data recieved from the client.
+									String[] args = data[2].split(" ");
+									for (int i = 0; i < args.length; i++)
+										consoleArea.append("Data recieved: " + args[i] + "\n");
+									
+									//ADMIN COMMANDS
+									if (checkAdminCommands(clientID, args));
+									
+									//NON-ADMIN COMMANDS
+									else if (checkNonAdminCommands(clientID, args));
+									
+									//SHARED COMMANDS
+									else if (checkSharedCommands(clientID, args));
+									
+									else
+										pmUser(clientID, "<font color = red>Invalid command.</font>");
 								}
 								else
 								{
-									writer.println("response" + ds + "login" + ds + "Account in use");
-									writer.flush();
-									consoleArea.append("Sent response success to client " + clientID + ". \n");
+									for (int i = 0; i < readFileToList("filterwords.list").size(); i++)
+									{
+										if (data[2].contains(readFileToList("filterwords.list").get(i)))
+										{
+											String word = readFileToList("filterwords.list").get(i);
+											String newword = "";
+											for (int t = 0; t < word.length(); t++) newword += "*";
+											int index = data[2].indexOf(word);
+											data[2] = data[2].substring(0, index) + newword + 
+													data[2].substring(index + word.length(), data[2].length());
+										}
+									}
+									
+									if (data[2].contains("<font color"))
+									{
+										broadcast("chat" + ds + "(" + getUserPrefix(data[1]) + 
+												") </font><font color = " + usercolor.get(data[1]) + ">" + 
+												data[1] + ds + "</font>" + data[2] + "</font>");
+									}
+									else
+									{
+										broadcast("chat" + ds + "(" + getUserPrefix(data[1]) + ") </font><font color = " + 
+												usercolor.get(data[1]) + ">" + data[1] + ds + 
+												"</font><font color = black>" + data[2] + "</font>");
+									}
+									
+									chatlog.append("[" + getTime() + "]  " + data[1] + ": " + data[2] + "\n");
 								}
 							}
 							else
 							{
-								writer.println("response" + ds + "login" + ds + "Incorrent Login");
-								writer.flush();
-								consoleArea.append("Sent response incorrect to client " + clientID + ". \n");
+								consoleArea.append(data[1] + "[" + clientSocket.getInetAddress() + "]" + 
+										" tried to send a message illegally.\nThey may be using a modified client.\n");
+								chatlog.append("[" + getTime() + "]  -----{" + clientSocket.getInetAddress() + "}" + 
+										" tried to send a message illegally.\nThey may be using a modified client-----\n");
 							}
 						}
-						
-						clientIDs.remove(clientID);
-						clientOutputStreams.get(clientID).close();
-						clientSocket.close();
-						break;
-					}
+						//A request can be made from the client when it needs
+						//data, for example when signing up and loging in.
+						if (data[0].equals("request"))
+						{
+							//FORMAT: request÷type÷username÷password
+							//INDEX:    0      1      2         3
+							if (data[1].equals("signup"))
+							{
+								File file = new File("accounts.list");
+								if (!file.exists()) file.createNewFile();
+								
+								BufferedReader filereader = new BufferedReader(new FileReader(file));
+								String line = "", accounts = "";
+								while ((line = filereader.readLine()) != null)
+									accounts += line + "\n";
+								filereader.close();
+								
+								//Check the data string for any illegal characters.
+								for (int i = 0; i < data.length; i++)
+								{
+									if (data[i].contains(" "))
+									{
+										consoleArea.append("Failed to complete signup process for client " + clientID + ". \n" +
+												" Username or password contained illegal characters. \n");
+										writer.println("response" + ds + "signup" + ds + "Illegal characters");
+										writer.flush();
+									}
+								}
+								
+								ArrayList<String> usernamesList = readAccountsList("username");
+								//Check the username and password for divider characters.
+								if (data.length > 4 || data[2].equals("") || data[3].equals(""))
+								{
+									consoleArea.append("Failed to complete signup process for client " + clientID + ". \n" +
+											" Username or password contained illegal characters. \n");
+									writer.println("response" + ds + "signup" + ds + "Illegal characters");
+									writer.flush();
+								}
+								
+								//Check that the username isn't already taken.
+								else if (usernamesList.contains(data[2]))
+								{
+									consoleArea.append("Failed to complete signup process for client " + clientID + ". \n" +
+											" Username was taken. \n");
+									writer.println("response" + ds + "signup" + ds + "Username is taken");
+									writer.flush();
+								}
+								
+								else
+								{	
+									BufferedWriter filewriter = new BufferedWriter(new FileWriter(file));
+									filewriter.write(accounts + data[2] + "  " + data[3] + "  " + "notadmin  " + "\n");
+									filewriter.close();
+									
+									writer.println("response" + ds + "signup" + ds + "Account created");
+									writer.flush();
+								}
+							}
+							else if (data[1].equals("login"))
+							{
+								ArrayList<String> usernamesList = readAccountsList("username");
+								ArrayList<String> passwordsList = readAccountsList("password");
+								
+								if (usernamesList.contains(data[2]) &&
+										passwordsList.contains(data[3]) &&
+										(usernamesList.indexOf(data[2])) == (passwordsList.indexOf(data[3])))
+								{
+									if (!users.containsKey(data[2]))
+									{
+										writer.println("response" + ds + "login" + ds + "Success");
+										writer.flush();
+										consoleArea.append("Sent response success to client " + clientID + ". \n");
+									}
+									else
+									{
+										writer.println("response" + ds + "login" + ds + "Account in use");
+										writer.flush();
+										consoleArea.append("Sent response success to client " + clientID + ". \n");
+									}
+								}
+								else
+								{
+									writer.println("response" + ds + "login" + ds + "Incorrent login");
+									writer.flush();
+									consoleArea.append("Sent response incorrect to client " + clientID + ". \n");
+								}
+							}
+							
+							clientIDs.remove(clientID);
+							clientOutputStreams.get(clientID).close();
+							clientSocket.close();
+							break;
+						}
+						else if (data[0].equals("update"))
+						{
+							if (data[1].equals("username"))
+							{
+								ArrayList<String> usernamesList = readAccountsList("username");
+								if (usernamesList.contains(data[2]))
+									if (usernamesList.contains(data[3]) == false)
+										editAccountsFile("username", data[2], data[3]);
+							}
+							else if (data[1].equals("password"))
+							{
+								ArrayList<String> usernamesList = readAccountsList("username");
+								ArrayList<String> passwordsList = readAccountsList("password");
+							
+								//Compares the credentials to the main accounts file.
+								if (usernamesList.contains(data[2]) &&
+										passwordsList.contains(data[3]) &&
+										(usernamesList.indexOf(data[2])) == (passwordsList.indexOf(data[3])))
+								{
+									editAccountsFile("password", data[2], data[4]);
+								}
+							}
+						}
 					}
 					catch (Exception e)
 					{
 						if (clientSocket.isClosed() == false)
 						{
 							consoleArea.append("ERROR: Failed to read a client's data. \n");
+							chatlog.append("[" + getTime() + "]  ERROR: Failed to read a client's data.\n");
 							e.printStackTrace();
 						}
 					}
@@ -362,8 +447,9 @@ public class Server extends JFrame
 		}
 	}
 	
-   //Checks for special commands for administrators and moderators.
-   //(Will only run for admins.)
+    //Checks for special commands for administrators and moderators.
+    //(Will only run for admins.)
+	//Returns true to be marked as a valid command.
 	private boolean checkAdminCommands(int clientID, String[] args)
 	{
 		if (isAdmin((String)users.get(clientID)))
@@ -378,14 +464,16 @@ public class Server extends JFrame
 				   + "/disconnect<br> "
 				   + "/pm &lt;user&gt; &lt;message&gt;<br> "
 				   + "/listusers<br> "
+				   + "/version<br> "
 				   + "/broadcast &lt;message&gt;<br> "
-				   + "/kick &lt;user&gt; &lt;reason&gt;<br> "
-				   + "/ban &lt;user&gt; &lt;reason&gt;<br> "
+				   + "/kick &lt;user&gt;<br> "
+				   + "/ban &lt;user&gt;<br> "
 				   + "/unban &lt;user&gt;<br> "
 				   + "/stopserver<br> "
 				   + "/restartserver");
 				return true;
 			}
+			
 			else if (args[0].equalsIgnoreCase("/broadcast") && args.length >= 2)
 			{
 				String message = "";
@@ -394,6 +482,7 @@ public class Server extends JFrame
 						"</font><font color = \"red\"></font>" + message);
 				return true;
 			}
+			
 			else if (args[0].equalsIgnoreCase("/stopserver") && args.length == 1)
 			{
 				broadcast("chat" + ds + "</font><font color = \"red\">SERVER" + ds + 
@@ -403,6 +492,7 @@ public class Server extends JFrame
 				System.exit(0);
 				return true;
 			}
+			
 			else if (args[0].equalsIgnoreCase("/restartserver") && args.length == 1)
 			{
 				broadcast("chat" + ds + "</font><font color = \"red\">SERVER" + ds + 
@@ -425,45 +515,60 @@ public class Server extends JFrame
 				startServer();
 				return true;
 			}
-			else if (args[0].equalsIgnoreCase("/kick") && args.length >= 3)
+			
+			else if (args[0].equalsIgnoreCase("/kick"))
 			{
-				if (users.containsKey(args[1]))
+				if (args.length == 2)
 				{
-					kickUser(args[1], "kick", args, (int)users.get(args[1]));
+					if (users.containsKey(args[1]))
+						kickUser(args[1], "kick", args, (int)users.get(args[1]));
+					else
+						pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 				}
-				else
-				{
-					pmUser(clientID, "User does not exist.");
-				}
+				else if (args.length < 2)
+					pmUser(clientID, "</font><font color = red>You need to specify a user to kick.</font>");
+				else if (args.length > 2)
+					pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 				return true;
 			}
-			else if (args[0].equalsIgnoreCase("/ban") && args.length >= 3)
+			
+			else if (args[0].equalsIgnoreCase("/ban"))
 			{
-				if (users.containsKey(args[1]))
+				if (args.length == 2)
 				{
-					int otherclientID = (int)users.get(args[1]);
-					String message = "";
-					for (int i = 2; i < args.length; i++) message += (args[i] + " ");
-					kickUser(args[1], "ban", args, otherclientID);
-					banUser(args[1], message, otherclientID);
+					if (users.containsKey(args[1]))
+					{
+						int otherclientID = (int)users.get(args[1]);
+						kickUser(args[1], "ban", args, otherclientID);
+						banUser(args[1], otherclientID);
+					}
+					else
+						pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 				}
-				else
-				{
-					pmUser(clientID, "<font color = red>User does not exist.</font>");
-				}
+				else if (args.length < 2)
+					pmUser(clientID, "</font><font color = red>You need to specify a user to ban.</font>");
+				else if (args.length > 2)
+					pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 				return true;
 			}
-			else if (args[0].equalsIgnoreCase("/unban") && args.length == 2)
+			
+			else if (args[0].equalsIgnoreCase("/unban"))
 			{
-				unbanUser(args[1], clientID);
+				if (args.length == 2)
+					unbanUser(args[1], clientID);
+				else if (args.length < 2)
+					pmUser(clientID, "</font><font color = red>You need to specify a user to unban.</font>");
+				else if (args.length > 2)
+					pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 				return true;
 			}
 		}
 		return false;
 	}
 	
-   //Checks for regular commands for anyone who is not admin.
-   //(Will only run for non-admins. Will not run for admins.)
+    //Checks for regular commands for anyone who is not admin.
+    //(Will only run for non-admins. Will not run for admins.)
+	//Returns true to be marked as a valid command.
 	private boolean checkNonAdminCommands(int clientID, String[] args)
 	{
 		if (isAdmin((String)users.get(clientID)) == false)
@@ -484,25 +589,33 @@ public class Server extends JFrame
 		return false;
 	}
 	
-   //Checks for commands that don't require admin or non-admin.
-   //(Will run for admin and non admins.)
+    //Checks for commands that don't require admin or non-admin.
+    //(Will run for admin and non admins.)
+    //Returns true to be marked as a valid command.
 	private boolean checkSharedCommands(int clientID, String[] args)
 	{
-		if (args[0].equalsIgnoreCase("/pm") && args.length >= 3)
+		if (args[0].equalsIgnoreCase("/pm"))
 		{
-			if (users.containsKey(args[1]))
+			if (args.length >= 3)
 			{
-				String message = "";
-				for (int i = 2; i < args.length; i++) message += (args[i] + " ");
-				pmOtherUser(clientID, args[1], message);
-				pmUser(clientID, "</font><font color = black>Sent message to " + args[1] + ".</font>");
+				if (users.containsKey(args[1]))
+				{
+					String message = "";
+					for (int i = 2; i < args.length; i++) message += (args[i] + " ");
+					pmOtherUser(clientID, args[1], message);
+					pmUser(clientID, message);
+				}
+				else
+					pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
 			}
-			else
-			{
-				pmUser(clientID, "</font><font color = red>Could not find user.</font>");
-			}
+			else if (args.length == 2)
+				pmUser(clientID, "</font><font color = red>You have to specify a message to send.</font>");
+			else if (args.length == 1)
+				pmUser(clientID, "</font><font color = red>You have to specify a message to send<br>" + 
+							"and a user to send the message to.</font>");
 			return true;
 		}
+		
 		else if (args[0].equalsIgnoreCase("/listusers") && args.length == 1)
 		{
 			String onlineusers = "";
@@ -512,6 +625,12 @@ public class Server extends JFrame
 				if (i + 1 < usersModel.size()) onlineusers += "</font>, ";
 			}
 			pmUser(clientID, "</font><font color = red></font>" + onlineusers + "<font size = 5>");
+			return true;
+		}
+		
+		else if (args[0].equalsIgnoreCase("/version") && args.length == 1)
+		{
+			pmUser(clientID, "</font><font color = red></font>The server is running " + version + ".<font size = 5>");
 			return true;
 		}
 		return false;
@@ -531,9 +650,7 @@ public class Server extends JFrame
 			BufferedReader filereader = new BufferedReader(new FileReader(file));
 			String line = "";
 			while ((line = filereader.readLine()) != null)
-			{
 				words.add(line.replace("\n", ""));
-			}
 			filereader.close();
 		}
 		catch(Exception e)
@@ -544,8 +661,8 @@ public class Server extends JFrame
 		return words;
 	}
 	
-   //Returns a list of any data related to the user
-   //that the server holds on file.
+    //Returns a list of any data related to the user
+    //that the server holds on file.
 	private ArrayList<String> readAccountsList(String type)
 	{
 		ArrayList<String> accountsList = new ArrayList<String>();
@@ -562,25 +679,15 @@ public class Server extends JFrame
 				String[] acc = line.split("  ");
 				
 				if (type.equalsIgnoreCase("all"))
-				{
 					accountsList.add(line);
-				}
-				if (type.equalsIgnoreCase("username"))
-				{
+				else if (type.equalsIgnoreCase("username"))
 					accountsList.add(acc[0]);
-				}
 				else if (type.equalsIgnoreCase("password"))
-				{
 					accountsList.add(acc[1]);
-				}
 				else if (type.equalsIgnoreCase("admin"))
-				{
 					accountsList.add(acc[2]);
-				}
 				else if (type.equalsIgnoreCase("prefix"))
-				{
 					accountsList.add(acc[3]);
-				}
 			}
 			filereader.close();
 		}
@@ -592,9 +699,7 @@ public class Server extends JFrame
 		return accountsList;
 	}
 	
-	//This is a very specialized method that looks for the specified line in
-	//the accounts file, and changes the third argument to is/isn't admin.
-	private void editAccountsFileAdmin(String username, boolean isAdmin)
+	private void editAccountsFile(String type, String username, String newitem)
 	{
 		ArrayList<String> accounts = readAccountsList("all");
 		String accountsString = "";
@@ -610,19 +715,18 @@ public class Server extends JFrame
 		
 		for (int i = 0; i < acc.length; i++)
 		{
-			if (i == 2) 
-			{
-				if (isAdmin) accString += "isadmin  ";
-				else accString += "notadmin  ";
-			}
+			if (i == 0 && type == "username") 
+				accString += (newitem + "  ");
+			else if (i == 1 && type == "password")
+				accString += (newitem + "  ");
+			else if (i == 2 && type == "isadmin")
+				accString += (newitem + "  ");
 			else accString += acc[i] + "  ";
 		}
 		accounts.set(index, accString);
 		
 		for (int i = 0; i < accounts.size(); i++)
-		{
 			accountsString += accounts.get(i) + "\n";
-		}
 		try
 		{
 			File file = new File("accounts.list");
@@ -657,8 +761,8 @@ public class Server extends JFrame
 		return adminModel.contains(username);
 	}
 	
-   //Broadcasts the specified message to all connected users
-   //using the clientOutputStream. Type: chat
+    //Broadcasts the specified message to all connected users
+    //using the clientOutputStream. Type: chat
 	private void broadcast(String message)
 	{
 		int count = 0;
@@ -674,8 +778,8 @@ public class Server extends JFrame
 		consoleArea.append("Sent message to " + count + " clients. \n");
 	}
 	
-   //Sends the specified message to the specified user.
-   //Used by the server to address a user.
+    //Sends the specified message to the specified user.
+    //Used by the server to address a user.
 	private void pmUser(int clientID, String message)
 	{
 		PrintWriter writer = clientOutputStreams.get(clientID);
@@ -684,12 +788,13 @@ public class Server extends JFrame
 		consoleArea.append("Sent message from " + clientID + " to client " + clientID + "\n");
 	}
 	
-   //Send the specified message to the specified user from the specified client.
-   //Used in the "pm" command. Could also be used to "impersonate" someone.
+    //Send the specified message to the specified user from the specified client.
+    //Used in the "pm" command. Could also be used to "impersonate" someone.
 	private void pmOtherUser(int clientID, String username, String message)
 	{
 		int otherClientID = (int)users.get(username);
 		PrintWriter writer = clientOutputStreams.get(otherClientID);
+		PrintWriter thisClientWriter = clientOutputStreams.get(clientID);
 		
 		for (int i = 0; i < readFileToList("filterwords.list").size(); i++)
 		{
@@ -710,10 +815,18 @@ public class Server extends JFrame
 						"</font> (" + getUserPrefix((String)users.get(clientID)) + ") </font>" + "<font color = " + 
 						usercolor.get(users.get(clientID)) + ">" + users.get(clientID) + ds + "</font>" + 
 						message + "</font>");
+			thisClientWriter.println("chat" + ds + "<font color = \"red\">[PM]" + 
+					"</font> (" + getUserPrefix((String)users.get(clientID)) + ") </font>" + "<font color = " + 
+					usercolor.get(users.get(clientID)) + ">" + users.get(clientID) + ds + "</font>" + 
+					message + "</font>");
 		}
 		else
 		{
 			writer.println("chat" + ds + "<font color = \"red\">[PM]" + 
+					"</font> (" + getUserPrefix((String)users.get(clientID)) + ") </font><font color = " + 
+					usercolor.get(users.get(clientID)) + ">" + users.get(clientID) + ds + 
+					"</font><font color = black>" + message + "</font>");
+			thisClientWriter.println("chat" + ds + "<font color = \"red\">[PM]" + 
 					"</font> (" + getUserPrefix((String)users.get(clientID)) + ") </font><font color = " + 
 					usercolor.get(users.get(clientID)) + ">" + users.get(clientID) + ds + 
 					"</font><font color = black>" + message + "</font>");
@@ -722,6 +835,7 @@ public class Server extends JFrame
 		consoleArea.append("Sent message from " + clientID + " to client " + otherClientID + "\n");
 	}
 	
+	//Returns the HTML formatted prefix string for the specified user.
 	private String getUserPrefix(String username)
 	{
 		String prefix = "<font color = #6E6E6E>Guest</font><font color = black>";
@@ -739,6 +853,8 @@ public class Server extends JFrame
 		return prefix;
 	}
 	
+	//Closes the sockets for each client.
+	//The server remains open.
 	private void disconnectAllUsers()
 	{
 		for (int i = 0; i < clientOutputStreams.size(); i++)
@@ -764,7 +880,7 @@ public class Server extends JFrame
 			writer.println("chat" + ds + "<font color = \"red\">SERVER" + 
 							ds + "<font color = \"red\">You are now an admin.");
 			writer.flush();
-			editAccountsFileAdmin(username, true);
+			editAccountsFile("isadmin", username, "isadmin");
 		}
 	}
 	
@@ -780,7 +896,7 @@ public class Server extends JFrame
 			writer.println("chat" + ds + "<font color = \"red\">SERVER" + 
 							ds + "<font color = \"red\">You are no longer an admin.");
 			writer.flush();
-			editAccountsFileAdmin(username, false);
+			editAccountsFile("isadmin", username, "notadmin");
 		}
 	}
 	
@@ -788,14 +904,10 @@ public class Server extends JFrame
 	//This method is also used to assist the ban method.
 	private void kickUser(String username, String type, String args[], int clientID)
 	{
-		String message = "";
-		for (int i = 2; i < args.length; i++) message += (args[i] + " ");
-		message = message.substring(0, message.length() - 1);
 		broadcast("disconnect" + ds + users.get(users.get(args[1])));
 		if (type.equalsIgnoreCase("kick"))
 			broadcast("chat" + ds + "</font><font color = \"red\">SERVER" + ds + 
-						"</font><font color = \"red\">User \"" + args[1] + "\" has been kicked for \"" + 
-						message + "\"" + "</font>");
+						"</font><font color = \"red\">User \"" + args[1] + "\" has been kicked.</font>");
 		else if (type.equalsIgnoreCase("ban"))
 			
 		clientOutputStreams.get((int)users.get(args[1])).close();
@@ -809,7 +921,7 @@ public class Server extends JFrame
 	//Adds the specified user to a "banlist". Any user
 	//on the list is prevented from joining the server.
 	//All players are notified of this event.
-	private void banUser(String username, String reason, int clientID)
+	private void banUser(String username, int clientID)
 	{
 		ArrayList<String> banlist = readFileToList("bans.list");
 		if (!banlist.contains(username.replace(System.getProperty("line.separator"), "")))
@@ -817,16 +929,11 @@ public class Server extends JFrame
 			banlist.add(username + "\n");
 			writeBanList(banlist);
 			
-			if (reason.endsWith(" ")) reason = reason.substring(0, reason.length() - 1);
-			
 			broadcast("chat" + ds + "</font><font color = \"red\">SERVER" + ds + 
-					"</font><font color = \"red\">User \"" + username + "\" has been banned for \"" + 
-					reason + "\"" + "</font>");
+					"</font><font color = \"red\">User \"" + username + "\" has been banned.</font>");
 		}
 		else
-		{
 			pmUser(clientID, "<font color = red>User is already banned.</font>");
-		}
 	}
 	
 	//Removed the specified user from the banlist.
@@ -844,9 +951,7 @@ public class Server extends JFrame
 					"</font><font color = \"red\">User \"" + username + "\" has been unbanned</font>");
 		}
 		else
-		{
 			pmUser(clientID, "<font color = red>User has not been banned.</font>");
-		}
 	}
 	
 	//Writes all the contents of the specified banlist into the banlist file.
@@ -860,9 +965,7 @@ public class Server extends JFrame
 			if (!file.exists()) file.createNewFile();
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			for (int i = 0; i < bannedUsers.size(); i++)
-			{
 				writer.write(bannedUsers.get(i) + "\n");
-			}
 			writer.close();
 		}
 		catch (IOException e)
@@ -887,6 +990,7 @@ public class Server extends JFrame
 		broadcast("chat" + ds + "</font><font color = \"red\">SERVER" + ds + 
 				"</font><font color = \"red\">Server has been closed.</font>");
 		consoleArea.append("Stopping server... \n");
+		chatlog.append("[" + getTime() + "]  Stopping server...\n");
 		
 		disconnectAllUsers();
 		users.clear();
@@ -899,6 +1003,7 @@ public class Server extends JFrame
 			toggleUIActions(false);
 			
 			consoleArea.append("Server stopped. \n");
+			chatlog.append("[" + getTime() + "]  Server stopped.\n");
 		}
 		catch (Exception e) { consoleArea.append("ERROR: Failed to stop server."); }
 	}
@@ -909,18 +1014,23 @@ public class Server extends JFrame
 		{
 			port = Integer.parseInt(txtPort.getText());
 			consoleArea.append("Starting server on port " + port + "... \n");
+			chatlog.append("[" + getTime() + "]  Starting server on port " + port + "...\n");
 			
 			try
 			{
 				servsocket = new ServerSocket(port);
 				toggleUIActions(true);
-				consoleArea.append("Starting started. \n");
+				consoleArea.append("Server started. \n");
+				chatlog.append("[" + getTime() + "]  Server started.\n");
 				
 				consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
 				
-				if (!new File("bans.list").exists()) new File("bans.list").createNewFile();
-				if (!new File("accounts.list").exists()) new File("accounts.list").createNewFile();
-				if (!new File("filterwords.list").exists()) new File("filterwords.list").createNewFile();
+				if (!new File("bans.list").exists())
+					new File("bans.list").createNewFile();
+				if (!new File("accounts.list").exists())
+					new File("accounts.list").createNewFile();
+				if (!new File("filterwords.list").exists())
+					new File("filterwords.list").createNewFile();
 				
 				while(true)
 				{
@@ -954,10 +1064,19 @@ public class Server extends JFrame
 		txtPort.setEnabled(!enabled);
 	}
 	
+	//Returns the current time (properly formatted).
+	private String getTime()
+	{
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
+		return time.format(c.getTime());
+	}
+	
+	//Setup swing components.
 	private void initUI()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 748, 500);
+		setBounds(100, 100, 750, 500);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -965,8 +1084,7 @@ public class Server extends JFrame
 		
 		btnStop = new JButton("Stop");
 		btnStop.setEnabled(false);
-		contentPane.setLayout(new MigLayout("", "[371.00px][123.00,grow][133.00,grow]", 
-												"[29px][376px,grow][29px][]"));
+		contentPane.setLayout(new MigLayout("", "[371.00px,grow][123.00,grow][133.00,grow]", "[29px][376px,grow][29px][]"));
 		
 		lblConsole = new JLabel("Console");
 		contentPane.add(lblConsole, "cell 0 0");
@@ -1013,7 +1131,7 @@ public class Server extends JFrame
 		btnAddAdmin = new JButton("Add");
 		btnAddAdmin.setEnabled(false);
 		
-		lblPort = new JLabel("Port");
+		lblPort = new JLabel("Port:");
 		contentPane.add(lblPort, "flowx,cell 0 3");
 		contentPane.add(btnAddAdmin, "flowx,cell 2 3,alignx right");
 		contentPane.add(btnRemoveAdmin, "cell 2 3");
@@ -1030,12 +1148,35 @@ public class Server extends JFrame
 	//Separated from the initUI() for easier access.
 	private void createListeners()
 	{
-		addWindowListener(new WindowAdapter()
+		this.addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				stopServer();
+				if (servsocket != null && !servsocket.isClosed())
+					stopServer();
 				consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+				
+				JOptionPane savelog = new JOptionPane();
+				int option = savelog.showConfirmDialog(Server.this, 
+						"Would you like to save the log from this session?", 
+						"Save Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				
+				if (option == 0)
+				{
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+					LocalDate localDate = LocalDate.now();
+					try
+					{
+						BufferedWriter writer = new BufferedWriter(new FileWriter(
+								new File("Server Log [" + dtf.format(localDate) + "]")));
+						writer.write(chatlog.toString());
+						writer.close();
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 		
@@ -1104,6 +1245,34 @@ public class Server extends JFrame
 					adminsList.clearSelection();
 				}
 			}
+		});
+		
+		this.addComponentListener(new ComponentListener()
+		{
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				int xdiff = (e.getComponent().getWidth() - 750) / 10;
+				int ydiff = (e.getComponent().getHeight() - 500) / 10;
+				int fontdiff = (xdiff + ydiff) / 20;
+				Font newfont = new Font("Tahoma", Font.PLAIN, 16 + (fontdiff));
+				
+				lblAdmins.setFont(newfont);
+				lblConsole.setFont(newfont);
+				lblOnlineUsers.setFont(newfont);
+				lblPort.setFont(newfont);
+				
+				btnAddAdmin.setFont(newfont);
+				btnRemoveAdmin.setFont(newfont);
+				btnStart.setFont(newfont);
+				btnStop.setFont(newfont);
+				
+				txtAdminName.setFont(newfont);
+				txtPort.setFont(newfont);
+			}
+			public void componentMoved(ComponentEvent e) {}
+			public void componentShown(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
 		});
 	}
 	

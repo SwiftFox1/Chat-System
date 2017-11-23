@@ -1,7 +1,6 @@
 //Chat System (SignUp)
-//Running SwiftProtocol v1.06
 //Written By Ethan Rowan
-//June 2017
+//June-October 2017
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -24,7 +23,7 @@ import net.miginfocom.swing.MigLayout;
 public class SignUp extends JFrame
 {
 	String title = "SwiftChat";
-	String version = "v1.06";
+	String version = "v1.1";
 	
 	String username, password;
 	boolean isConnected = false;
@@ -213,45 +212,45 @@ public class SignUp extends JFrame
 		
 		txtUsername.addMouseListener(new MouseListener()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mousePressed(MouseEvent e)
 			{
 				txtUsername.setText("");
 			}
 			public void mouseReleased(MouseEvent e) {}
-			public void mousePressed(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 		});
 		txtPassword.addMouseListener(new MouseListener()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mousePressed(MouseEvent e)
 			{
 				txtPassword.setText("");
 			}
 			public void mouseReleased(MouseEvent e) {}
-			public void mousePressed(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 		});
 		txtIP.addMouseListener(new MouseListener()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mousePressed(MouseEvent e)
 			{
 				txtIP.setText("");
 			}
 			public void mouseReleased(MouseEvent e) {}
-			public void mousePressed(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 		});
 		txtPort.addMouseListener(new MouseListener()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mousePressed(MouseEvent e)
 			{
 				txtPort.setText("");
 			}
 			public void mouseReleased(MouseEvent e) {}
-			public void mousePressed(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {}
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 		});
