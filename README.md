@@ -1,6 +1,6 @@
 # Chat System
 This is a simple java chat client and server project that is cross-compatible with Windows, Mac, Linux, and Android.
-Commands and other features are fully implemented (with more to come) as you would expect.
+Commands and other features are fully implemented (with more to come).
 
 <b>Java Version</b>
 - Fully supports sending and receiving HTML text.
@@ -8,15 +8,14 @@ Commands and other features are fully implemented (with more to come) as you wou
 
 <b>Android Version</b>
 - Semi supports HTML. (Sending and receiving basic tags)
-- It is a simple port from the java version.
 - More user friendly.
 - Supports emojis :D
 
 <b>Commands</b>
 - /help
 - /broadcast <message>    (Admin)
-- /kick &lt;user&gt; &lt;reason&gt;    (Admin)
-- /ban &lt;user&gt; &lt;reason&gt;    (Admin)
+- /kick &lt;user&gt;    (Admin)
+- /ban &lt;user&gt;    (Admin)
 - /unban &lt;user&gt;    (Admin)
 - /stopserver    (Admin)
 - /restartserver    (Admin)
@@ -24,3 +23,4 @@ Commands and other features are fully implemented (with more to come) as you wou
 - /listusers
 - /clear
 - /debug
+- /version
