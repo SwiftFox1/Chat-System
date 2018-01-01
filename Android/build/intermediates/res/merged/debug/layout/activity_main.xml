@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="me.rowan.ethan.swiftchat.Main">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            android:elevation="1dp">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/menufab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/whiteplus"
+        app:fabSize="normal"
+        />
+
+    <EditText
+        android:layout_width="297dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="10"
+        android:id="@+id/txtMessage"
+        android:maxLines="1"
+        android:imeActionLabel="Done"
+        android:imeOptions="actionDone"
+        android:layout_weight="1"
+        android:layout_gravity="bottom|left"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"
+        android:enabled="false"
+        android:textSize="18sp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/play"
+        android:id="@+id/connectanddisconnectfab"
+        app:layout_anchor="@id/menufab"
+        android:layout_gravity="bottom|left"
+        app:layout_anchorGravity="bottom|right"
+        android:layout_marginRight="25dp"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/settings"
+        android:id="@+id/settingsfab"
+        android:layout_gravity="bottom"
+        app:layout_anchor="@id/connectanddisconnectfab"
+        app:layout_anchorGravity="bottom|right"
+        android:layout_marginRight="25dp"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/message"
+        android:id="@+id/sendmessagefab"
+        app:layout_anchorGravity="center_vertical|left"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"/>
+
+    <include layout="@layout/content_main" />
+
+</android.support.design.widget.CoordinatorLayout>

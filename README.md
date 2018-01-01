@@ -11,7 +11,7 @@ Commands and other features are fully implemented (with more to come).
 - More user friendly.
 - Supports emojis :D
 
-<b>Commands</b>
+<b>Default Commands</b>
 - /help
 - /broadcast <message>    (Admin)
 - /kick &lt;user&gt;    (Admin)

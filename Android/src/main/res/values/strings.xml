@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">SwiftChat</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Login</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+    <string name="title_activity_sign_up">SignUp</string>
+
+
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+
+    <string name="slide_1_title">SwiftChat</string>
+    <string name="slide_1_desc">Welcome to</string>
+
+    <string name="slide_2_title">Simple Design</string>
+    <string name="slide_2_desc">Easy to use interface with a minimal design.</string>
+
+    <string name="slide_3_title">Private</string>
+    <string name="slide_3_desc">Create and join servers with a private group.</string>
+
+    <string name="slide_4_title">HTML Support</string>
+    <string name="slide_4_desc">Supports basic use of HTML design tags.</string>
+
+    <string name="slide_5_title">Emoji Support</string>
+    <string name="slide_5_desc">Supports common android emojis.</string>
+    <string name="title_activity_settings">Account Settings</string>
+    <string name="large_text">
+        ""
+    </string>
+</resources>

@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\res\\merged\\release\\menu\\menu_settings.xml",
+        "source": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\src\\main\\res\\menu\\menu_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\res\\merged\\release\\menu\\menu_main.xml",
+        "source": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\src\\main\\res\\menu\\menu_main.xml"
+    }
+]

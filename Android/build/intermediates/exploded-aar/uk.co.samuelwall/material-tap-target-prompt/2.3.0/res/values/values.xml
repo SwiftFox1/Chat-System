@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr format="reference" name="MaterialTapTargetPromptTheme"/>
+    <attr format="boolean" name="mttp_autoDismiss"/>
+    <attr format="boolean" name="mttp_autoFinish"/>
+    <attr format="color" name="mttp_backgroundColour"/>
+    <attr format="boolean" name="mttp_captureTouchEventOnFocal"/>
+    <attr format="boolean" name="mttp_captureTouchEventOutsidePrompt"/>
+    <attr format="color" name="mttp_focalColour"/>
+    <attr format="dimension" name="mttp_focalRadius"/>
+    <attr format="dimension" name="mttp_focalToTextPadding"/>
+    <attr format="color" name="mttp_iconColourFilter"/>
+    <attr format="reference" name="mttp_iconTint"/>
+    <attr format="enum" name="mttp_iconTintMode">
+        <enum name="SRC_OVER" value="3"/>
+        <enum name="SRC_IN" value="5"/>
+        <enum name="SRC_ATOP" value="9"/>
+        <enum name="MULTIPLY" value="14"/>
+        <enum name="SCREEN" value="15"/>
+        <enum name="ADD" value="16"/>
+    </attr>
+    <attr format="dimension" name="mttp_maxTextWidth"/>
+    <attr format="string" name="mttp_primaryText"/>
+    <attr format="color" name="mttp_primaryTextColour"/>
+    <attr format="string" name="mttp_primaryTextFontFamily"/>
+    <attr format="dimension" name="mttp_primaryTextSize"/>
+    <attr format="enum" name="mttp_primaryTextStyle">
+        <enum name="normal" value="0"/>
+        <enum name="bold" value="1"/>
+        <enum name="italic" value="2"/>
+    </attr>
+    <attr format="enum" name="mttp_primaryTextTypeface">
+        <enum name="normal" value="0"/>
+        <enum name="sans" value="1"/>
+        <enum name="serif" value="2"/>
+        <enum name="monospace" value="3"/>
+    </attr>
+    <attr format="string" name="mttp_secondaryText"/>
+    <attr format="color" name="mttp_secondaryTextColour"/>
+    <attr format="string" name="mttp_secondaryTextFontFamily"/>
+    <attr format="dimension" name="mttp_secondaryTextSize"/>
+    <attr format="enum" name="mttp_secondaryTextStyle">
+        <enum name="normal" value="0"/>
+        <enum name="bold" value="1"/>
+        <enum name="italic" value="2"/>
+    </attr>
+    <attr format="enum" name="mttp_secondaryTextTypeface">
+        <enum name="normal" value="0"/>
+        <enum name="sans" value="1"/>
+        <enum name="serif" value="2"/>
+        <enum name="monospace" value="3"/>
+    </attr>
+    <attr format="reference" name="mttp_target"/>
+    <attr format="dimension" name="mttp_textPadding"/>
+    <attr format="dimension" name="mttp_textSeparation"/>
+    <declare-styleable name="PromptView"><attr name="mttp_target"/><attr name="mttp_primaryText"/><attr name="mttp_secondaryText"/><attr name="mttp_primaryTextColour"/><attr name="mttp_secondaryTextColour"/><attr name="mttp_backgroundColour"/><attr name="mttp_focalColour"/><attr name="mttp_focalRadius"/><attr name="mttp_primaryTextSize"/><attr name="mttp_secondaryTextSize"/><attr name="mttp_maxTextWidth"/><attr name="mttp_textPadding"/><attr name="mttp_focalToTextPadding"/><attr name="mttp_textSeparation"/><attr name="mttp_autoDismiss"/><attr name="mttp_autoFinish"/><attr name="mttp_captureTouchEventOutsidePrompt"/><attr name="mttp_captureTouchEventOnFocal"/><attr name="mttp_primaryTextFontFamily"/><attr name="mttp_secondaryTextFontFamily"/><attr name="mttp_primaryTextStyle"/><attr name="mttp_secondaryTextStyle"/><attr name="mttp_primaryTextTypeface"/><attr name="mttp_secondaryTextTypeface"/><attr name="mttp_iconTint"/><attr name="mttp_iconTintMode"/><attr name="mttp_iconColourFilter"/></declare-styleable>
+    <item name="material_target_prompt_view" type="id"/>
+</resources>

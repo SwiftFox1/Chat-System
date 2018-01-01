@@ -1,0 +1,135 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:2:1-49:12
+	package
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:3:11-45
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:2:11-69
+	android:versionCode
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:5:5-66
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:5:22-64
+application
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:7:5-47:19
+MERGED from [com.android.support:design:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\design\25.1.0\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:transition:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\transition\25.1.0\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:appcompat-v7:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-v4:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-v4\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-media-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-fragment:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-fragment\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-ui:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-utils:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:animated-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-compat\26.0.0-alpha1\AndroidManifest.xml:29:5-20
+	android:label
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:10:9-34
+	android:supportsRtl
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:11:9-35
+	android:allowBackup
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:8:9-35
+	android:icon
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:9:9-50
+	android:theme
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:12:9-40
+activity#me.rowan.ethan.swiftchat.Main
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:13:9-19:20
+	android:screenOrientation
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:16:13-49
+	android:label
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:15:13-45
+	android:theme
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:17:13-44
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:14:13-33
+activity#me.rowan.ethan.swiftchat.Login
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:20:9-25:20
+	android:screenOrientation
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:23:13-49
+	android:label
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:22:13-38
+	android:windowSoftInputMode
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:24:13-54
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:21:13-34
+activity#me.rowan.ethan.swiftchat.SignUp
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:26:9-31:20
+	android:screenOrientation
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:29:13-49
+	android:label
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:28:13-59
+	android:windowSoftInputMode
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:30:13-54
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:27:13-35
+activity#me.rowan.ethan.swiftchat.WelcomeActivity
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:32:9-40:20
+	android:screenOrientation
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:34:13-49
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:33:13-44
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:35:13-39:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:36:17-68
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:36:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:38:17-76
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:38:27-74
+activity#me.rowan.ethan.swiftchat.Settings
+ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:41:9-46:20
+	android:screenOrientation
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:44:13-49
+	android:label
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:43:13-60
+	android:theme
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:45:13-44
+	android:name
+		ADDED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml:42:13-37
+uses-sdk
+INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [uk.co.samuelwall:material-tap-target-prompt:2.3.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\uk.co.samuelwall\material-tap-target-prompt\2.3.0\AndroidManifest.xml:23:5-25:41
+MERGED from [com.android.support:design:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\design\25.1.0\AndroidManifest.xml:21:5-23:62
+MERGED from [com.android.support:recyclerview-v7:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\25.1.0\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:transition:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\transition\25.1.0\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:support-v4:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-v4\26.0.0-alpha1\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-media-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\26.0.0-alpha1\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-fragment:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-fragment\26.0.0-alpha1\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-core-ui:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\26.0.0-alpha1\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-utils:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\26.0.0-alpha1\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:animated-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-compat\26.0.0-alpha1\AndroidManifest.xml:21:5-23:58
+	tools:overrideLibrary
+		ADDED from [com.android.support:design:25.1.0] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\design\25.1.0\AndroidManifest.xml:23:9-59
+	android:targetSdkVersion
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\src\main\AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:appcompat-v7:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:support-v4:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-v4\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:support-media-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:support-fragment:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-fragment\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:support-core-ui:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:support-core-utils:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+MERGED from [com.android.support:animated-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:22:5-24:41
+MERGED from [com.android.support:support-vector-drawable:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\26.0.0-alpha1\AndroidManifest.xml:22:5-24:41
+MERGED from [com.android.support:support-compat:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\support-compat\26.0.0-alpha1\AndroidManifest.xml:25:5-27:41
+	android:value
+		ADDED from [com.android.support:appcompat-v7:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:27:9-38
+	android:name
+		ADDED from [com.android.support:appcompat-v7:26.0.0-alpha1] C:\Users\Ethan\AndroidStudioProjects\SwiftChat\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:26:9-47

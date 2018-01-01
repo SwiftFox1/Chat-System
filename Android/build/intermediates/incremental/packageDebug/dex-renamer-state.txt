@@ -1,0 +1,7 @@
+#Sun Nov 12 21:21:27 EST 2017
+base.0=C\:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_da6396327598bc266836da2bf077c816464323de
+renamed.1=classes.dex
+renamed.0=classes2.dex
+file.1=C\:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_d60746c4b3694c2fbf1001c2f2ee53322afc4517\\classes.dex
+base.1=C\:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_d60746c4b3694c2fbf1001c2f2ee53322afc4517
+file.0=C\:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_da6396327598bc266836da2bf077c816464323de\\classes.dex

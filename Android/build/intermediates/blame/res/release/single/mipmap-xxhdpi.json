@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxhdpi\\ic_launcher.png",
+        "source": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\build\\intermediates\\res\\merged\\release\\mipmap-xxhdpi\\chat_launcher_icon.png",
+        "source": "C:\\Users\\Ethan\\AndroidStudioProjects\\SwiftChat\\app\\src\\main\\res\\mipmap-xxhdpi\\chat_launcher_icon.png"
+    }
+]
