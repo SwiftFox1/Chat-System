@@ -1,6 +1,6 @@
 //Chat System (Settings)
 //Written By Ethan Rowan
-//June-October 2017
+//June-January 2017-2018
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -11,6 +11,7 @@
  */
 package me.rowan.ethan;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.io.PrintWriter;
@@ -18,11 +19,13 @@ import java.io.PrintWriter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
@@ -32,17 +35,21 @@ import java.awt.event.ActionEvent;
 
 public class Settings extends JFrame
 {
+	String title = "Account Settings";
+	String version = "v1.3";
+	
+	String ds = "~";
+	
 	static String thisusername, thispassword, newusername, newpassword;
 	static Point thislocation;
 	static PrintWriter thiswriter;
-	
-	String ds = "~";
 	
 	private JPanel contentPane;
 	private JTextField txtUsername;
 	private JTextField txtPassword;
 	private JLabel lblUsername;
 	private JLabel lblPassword;
+	private JButton btnClose;
 	
 
 	public Settings(PrintWriter writer, String username, String password, Point location)
@@ -75,19 +82,33 @@ public class Settings extends JFrame
 					thisusername + ds + newusername);
 			thiswriter.flush();
 		}
+		//If either of the above cases are true, then the success dialog will show.
+		if ((newusername.length() > 0 && newusername != thisusername) ||
+				(newpassword.length() > 0 && newpassword != thispassword))
+		{
+			JOptionPane.showMessageDialog(this, new JLabel("Info updated! Reconnect to apply changes.", 
+					JLabel.CENTER), "Success", JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(this, new JLabel("Admin tag may be temporarily removed.", 
+					JLabel.CENTER), "Notice", JOptionPane.PLAIN_MESSAGE);
+		}
+		else
+			JOptionPane.showMessageDialog(this, new JLabel("Invalid fields.", 
+					JLabel.CENTER), "Error", JOptionPane.PLAIN_MESSAGE);
+		System.out.println(newusername.length() + "   " + newpassword.length());
 	}
 	
 	private void initUI()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 400, 264);
+		setUndecorated(true);
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		setContentPane(contentPane);
 		contentPane.setLayout(new MigLayout("", "[93.00][185.00,grow][93.00]", "[-18.00][60.00,bottom][71.00][][64.00][62.00]"));
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
-		JLabel lblSettings = new JLabel("Account Settings");
+		JLabel lblSettings = new JLabel(title);
 		lblSettings.setFont(new Font("Tahoma", Font.BOLD, 18));
 		contentPane.add(lblSettings, "cell 1 0,alignx center");
 		
@@ -117,7 +138,17 @@ public class Settings extends JFrame
 				sendUpdates();
 			}
 		});
-		contentPane.add(btnUpdate, "cell 1 5,alignx center");
+		contentPane.add(btnUpdate, "flowy,cell 1 5,alignx center");
+		
+		btnClose = new JButton("Close");
+		contentPane.add(btnClose, "cell 1 5,alignx center");
+		btnClose.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Settings.this.setVisible(false);
+			}
+		});
 		
 		txtUsername.addMouseListener(new MouseListener()
 		{

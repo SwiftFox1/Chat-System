@@ -1,6 +1,6 @@
 //Chat System (Client)
 //Written By Ethan Rowan
-//June-October 2017
+//June-January 2017-2018
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -29,7 +29,7 @@ import net.miginfocom.swing.MigLayout;
 public class Client extends JFrame
 {
 	String title = "SwiftChat";
-	String version = "v1.1";
+	String version = "v1.3";
 	
 	//Stores the username of this client.
 	String username = "";
@@ -229,7 +229,7 @@ public class Client extends JFrame
 	private boolean checkClientCommand(String message)
 	{
 		message = message.toLowerCase();
-		if (message.startsWith("/debug"))
+		if (message.startsWith("/debug") && message.length() == 6)
 		{
 			if (debug)
 			{
@@ -243,12 +243,12 @@ public class Client extends JFrame
 			}
 			return true;
 		}
-		else if (message.startsWith("/disconnect"))
+		else if (message.startsWith("/disconnect") && message.length() == 11)
 		{
 			disconnect(true);
 			return true;
 		}
-		else if (message.startsWith("/clear"))
+		else if (message.startsWith("/clear") && message.length() == 6)
 		{
 			chatbuilder = new StringBuilder();
 			chatArea.setText("");
@@ -412,6 +412,7 @@ public class Client extends JFrame
 				
 				btnConnect.setFont(newfont);
 				btnDisconnect.setFont(newfont);
+				btnSettings.setFont(newfont);
 				btnSend.setFont(newfont);
 				
 				txtMessage.setFont(newfont);

@@ -1,6 +1,6 @@
 //Chat System (SignUp)
 //Written By Ethan Rowan
-//June-October 2017
+//June-January 2017-2018
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -15,15 +15,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
 import net.miginfocom.swing.MigLayout;
 
 public class SignUp extends JFrame
 {
 	String title = "SwiftChat";
-	String version = "v1.1";
+	String version = "v1.3";
 	
 	String username, password;
 	boolean isConnected = false;
@@ -32,6 +36,10 @@ public class SignUp extends JFrame
 	PrintWriter writer;
 	BufferedReader reader;
 	String ds = "~";
+	
+	String savedIP;
+	int savedPort;
+	ArrayList<String> savedServers;
 	
 	static Point location;
 	int width, height;
@@ -44,10 +52,8 @@ public class SignUp extends JFrame
 	private JLabel lblUsername;
 	private JLabel lblPassword;
 	private JButton btnSignUp;
-	private JLabel lblHostIP;
-	private JTextField txtIP;
-	private JLabel lblHostPort;
-	private JTextField txtPort;
+	private JComboBox cmbxServer;
+	private JLabel lblServer;
 
 
 	public SignUp(Point location)
@@ -56,8 +62,12 @@ public class SignUp extends JFrame
 		width = dimension.width;
 		height = dimension.height;
 		
+		//Positions the login window at the location of the previous window if possible
 		this.location = new Point((width / 2) - 400 / 2, (height / 2) - 350 / 2);
 		if (location != null) this.location = location;
+		
+		savedServers = new ArrayList<String>();
+		checkServers();
 		
 		initUI();
 	}
@@ -66,7 +76,11 @@ public class SignUp extends JFrame
 	{
 		try
 		{
-			socket = new Socket(txtIP.getText(), Integer.parseInt(txtPort.getText()));
+			//Establishes a connection to the server as a client, but not as a user.
+			//This prevents signup connections from appearing as users.
+			//Note that there are other failsafes built into the server to
+			//catch this issue incase this code is modified.
+			socket = new Socket(savedIP, savedPort);
 			writer = new PrintWriter(socket.getOutputStream());
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			isConnected = true;
@@ -74,25 +88,103 @@ public class SignUp extends JFrame
 		} 
 		catch (Exception e)
 		{
-			displayConnectionError();
+			createError("Connection error: Unable to connect to the server. " +
+					"Check server details.");
 		}
 		return false;
 	}
 	
-	private void displayConnectionError()
+	private void disconnect()
 	{
-		btnLogin.setEnabled(false);
-		btnSignUp.setEnabled(false);
-		txtUsername.setText("Connection Error.");
-		txtPassword.setText("Connection Error.");
-		txtUsername.setEnabled(false);
-		txtPassword.setEnabled(false);
-		txtIP.setEnabled(false);
-		txtPort.setEnabled(false);
+		try
+		{
+			//Attempts to send a disconnect message to the server to safely disconnect.
+			//There is a failsafe built into the server incase this doesn't work.
+			writer.println("disconnect" + ds + "null");
+			writer.flush();
+			socket.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
-	private void connectionHandler()
+	public void createError(String message)
 	{
+		JOptionPane.showMessageDialog(this, new JLabel(message, 
+				JLabel.CENTER), "Error", JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	//Checks the servers.dat file for server info data,
+	//then stores it in the savedServers arraylist.
+	public void checkServers()
+	{
+		savedServers.clear();
+		savedServers.add("Select A Server...");
+		
+		try
+		{
+			File file = new File("/Java Program Data/SwiftChat/servers.dat");
+			file.getParentFile().mkdirs();
+			if (!file.exists())
+				file.createNewFile();
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String l = "";
+			
+			while ((l = reader.readLine()) != null)
+				savedServers.add(l);
+			reader.close();
+			
+			updateComboBox();
+		}
+		catch (IOException e)
+		{
+			createError("Failed to retrieve servers.");
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateComboBox()
+	{
+		if (cmbxServer != null)
+		{
+			//Add items to the combobox
+			cmbxServer.removeItem("Add New Server...");
+			cmbxServer.removeItem("Remove Server...");
+			
+			for (int i = 0; i < savedServers.size(); i++)
+				if (!modelContains(savedServers.get(i)))
+					cmbxServer.addItem(savedServers.get(i));
+			
+			
+			savedServers.add("Add New Server...");
+			savedServers.add("Remove Server...");
+			cmbxServer.addItem("Add New Server...");
+			cmbxServer.addItem("Remove Server...");
+					
+			
+			//Remove items from the combobox
+			ArrayList<String> removal = new ArrayList<String>();
+			if (cmbxServer != null)
+				for (int i = 0; i < cmbxServer.getItemCount(); i++)
+					if (!savedServers.contains(cmbxServer.getItemAt(i)))
+						removal.add((String)cmbxServer.getItemAt(i));
+			
+			for (int i = 0; i < removal.size(); i++)
+			{
+				String item = (String)removal.get(i);
+				if (modelContains(item))
+					cmbxServer.removeItem(item);
+			}
+		}
+	}
+	
+	private void validateRequest()
+	{
+		//Sends a login request to the server which then checks for conflicting credentials.
+		//This request returns "success" when the account is successfully registered.
+		//This request can return multiple types of errors.
 		writer.println("request" + ds + "signup" + ds + txtUsername.getText() + ds + txtPassword.getText());
 		writer.flush();
 		
@@ -102,31 +194,39 @@ public class SignUp extends JFrame
 			{
 				String[] data = reader.readLine().split(ds);
 				
-				if (data[2].equals("Account Created"))
+				if (data[2].equals("Account created"))
 				{
 					username = txtUsername.getText();
 					password = txtPassword.getText();
-					String ip = txtIP.getText();
-					int port = Integer.parseInt(txtPort.getText());
-					System.out.println("Account Created");
-					SignUp.this.setVisible(false);
-					Client client = new Client(username, password, ip, 
-							port, new Point(SignUp.this.getX(), SignUp.this.getY()));
+					
+					disconnect();
+					Client client = new Client(username, password, savedIP, 
+							savedPort, new Point(SignUp.this.getX() - (SignUp.this.getWidth() / 8), 
+									SignUp.this.getY() - (SignUp.this.getHeight() / 8)));
 					client.setVisible(true);
+					SignUp.this.setVisible(false);
 					break;
 				}
 				else
 				{
-					txtUsername.setText(data[2] + ".");
-					txtPassword.setText(data[2] + ".");
+					disconnect();
 					break;
 				}
 			}
 		}
 		catch(Exception e1)
 		{
-			displayConnectionError();
+			createError("Connection error: Unable to connect to the server. " +
+					"Check server details.");
 		}
+	}
+	
+	public boolean modelContains(String string)
+	{
+		for (int i = 0; i < cmbxServer.getItemCount(); i++)
+			if (cmbxServer.getItemAt(i).equals(string))
+				return true;
+		return false;
 	}
 	
 	private void initUI()
@@ -138,7 +238,7 @@ public class SignUp extends JFrame
 		setContentPane(contentPane);
 		setResizable(false);
 		setTitle("Sign Up");
-		contentPane.setLayout(new MigLayout("", "[66.00][grow][]", "[][][][][][][][][][][][][]"));
+		contentPane.setLayout(new MigLayout("", "[66.00][grow][]", "[][][][][][][][][][][]"));
 		
 		JLabel lblSwiftchatV = new JLabel(title + " " + version);
 		lblSwiftchatV.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -163,24 +263,15 @@ public class SignUp extends JFrame
 		contentPane.add(txtPassword, "cell 1 5,alignx center");
 		txtPassword.setColumns(10);
 		
-		lblHostIP = new JLabel("Host IP");
-		contentPane.add(lblHostIP, "cell 1 7,alignx center");
+		lblServer = new JLabel("Server");
+		contentPane.add(lblServer, "cell 1 6,alignx center");
 		
-		txtIP = new JTextField();
-		txtIP.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPane.add(txtIP, "cell 1 8,growx");
-		txtIP.setColumns(10);
-		
-		lblHostPort = new JLabel("Host Port");
-		contentPane.add(lblHostPort, "cell 1 9,alignx center");
-		
-		txtPort = new JTextField();
-		txtPort.setHorizontalAlignment(SwingConstants.CENTER);
-		contentPane.add(txtPort, "cell 1 10,alignx center");
-		txtPort.setColumns(10);
+		String[] servers = savedServers.toArray(new String[savedServers.size()]);
+		cmbxServer = new JComboBox(servers);
+		contentPane.add(cmbxServer, "cell 1 7,growx");
 		
 		btnSignUp = new JButton("Sign Up");
-		contentPane.add(btnSignUp, "cell 1 11,alignx center");
+		contentPane.add(btnSignUp, "cell 1 9,alignx center");
 		
 		createListeners();
 	}
@@ -191,11 +282,19 @@ public class SignUp extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				//All four fields are filled out
 				if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0 &&
-						txtIP.getText().length() > 0 && txtPort.getText().length() > 0 && tryConnect())
+						savedIP != "" && savedPort != 0 && tryConnect())
 				{
-					connectionHandler();
+					validateRequest();
 				}
+				//IP and port fields are not filled out.
+				else if (((savedIP == "" || savedIP == null) || savedPort == 0) &&
+						(txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0))
+					createError("Select a server before logging in!");
+				//Username and password fields are not filled out.
+				else if (txtUsername.getText().length() == 0 && txtPassword.getText().length() == 0)
+					createError("Fill out all fields before logging in.");
 			}
 		});
 		
@@ -207,7 +306,49 @@ public class SignUp extends JFrame
 												  SignUp.this.getY()));
 				login.setVisible(true);
 				SignUp.this.setVisible(false);
+				if (isConnected)
+					disconnect();
 			}
+		});
+		
+		cmbxServer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String item = (String)cmbxServer.getSelectedItem();
+				
+				if (item == "Add New Server...")
+				{
+					new AddServer(new Point(SignUp.this.getX() + ((getWidth() - 300) / 2), 
+							SignUp.this.getY() + ((getHeight() - 264) / 2))).setVisible(true);
+					cmbxServer.setSelectedItem("Select A Server...");
+				}
+				else if (item == "Remove Server...")
+				{
+					new RemoveServer(new Point(SignUp.this.getX() + ((getWidth() - 300) / 2), 
+							SignUp.this.getY() + ((getHeight() - 264) / 2))).setVisible(true);
+					cmbxServer.setSelectedItem("Select A Server...");
+				}
+				else if (item != "Select A Server...")
+				{
+					savedIP = item.substring(item.indexOf('-') + 1, item.indexOf(':'));
+					savedPort = Integer.parseInt(item.substring(item.indexOf(':') + 1, item.length()));
+				}
+				else
+				{
+					savedIP = "";
+					savedPort = 0;
+				}
+			}
+		});
+		cmbxServer.addPopupMenuListener(new PopupMenuListener()
+		{
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e)
+			{
+				checkServers();
+			}
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {}
+			public void popupMenuCanceled(PopupMenuEvent e) {}
 		});
 		
 		txtUsername.addMouseListener(new MouseListener()
@@ -226,28 +367,6 @@ public class SignUp extends JFrame
 			public void mousePressed(MouseEvent e)
 			{
 				txtPassword.setText("");
-			}
-			public void mouseReleased(MouseEvent e) {}
-			public void mouseClicked(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
-		});
-		txtIP.addMouseListener(new MouseListener()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				txtIP.setText("");
-			}
-			public void mouseReleased(MouseEvent e) {}
-			public void mouseClicked(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
-		});
-		txtPort.addMouseListener(new MouseListener()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				txtPort.setText("");
 			}
 			public void mouseReleased(MouseEvent e) {}
 			public void mouseClicked(MouseEvent e) {}

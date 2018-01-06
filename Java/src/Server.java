@@ -1,6 +1,6 @@
 //Chat System (Server)
 //Written By Ethan Rowan
-//June-October 2017
+//June-January 2017-2018
 /*
  * DISCLAIMER:
  * This is my first time working with socket programming,
@@ -27,9 +27,10 @@ import net.miginfocom.swing.MigLayout;
 public class Server extends JFrame
 {
 	String title = "SwiftChat";
-	String version = "v1.1";
+	String version = "v1.3";
 			
 	int port = 5555;
+	boolean debugging = false;
 	String[] data;    //The data is information received by each
 					  //client. This is how the server communicates
 					  //with each individual client.
@@ -79,6 +80,7 @@ public class Server extends JFrame
 	private JTextField txtAdminName;
 	private JLabel lblPort;
 	private JTextField txtPort;
+	private JButton btnDebugging;
 
 	
 	public Server()
@@ -104,6 +106,13 @@ public class Server extends JFrame
 		PrintWriter writer;
 		BufferedReader reader;
 		
+		/*
+		The protocol is the central control code for the server.
+		A new listener thread is created for each client that connects,
+		and is removed when they disconnect.
+		The code below can be modified to change the behaviour of
+		the protocol, and how the server handles the data from the clients.
+		*/
 		public Listener(int clientID, Socket clientSocket, PrintWriter writer)
 		{
 			this.clientSocket = clientSocket;
@@ -116,7 +125,7 @@ public class Server extends JFrame
 			} 
 			catch (IOException e)
 			{
-				consoleArea.append("Failed to create client reader. Has user disconnected? \n");
+				consoleArea.append("Failed to create client reader. Has the user disconnected? \n");
 			}
 		}
 		
@@ -132,8 +141,9 @@ public class Server extends JFrame
 					{
 						data = stream.split(ds);
 						
-						for (int i = 0; i < data.length; i++)
-							consoleArea.append("Data recieved: " + data[i] + "\n");
+						if (debugging)
+							for (int i = 0; i < data.length; i++)
+								consoleArea.append("Data recieved: " + data[i] + "\n");
 						
 						//A connect messaage will add a specified user to the
 						//server's cache, and notify all other connected users.
@@ -183,8 +193,10 @@ public class Server extends JFrame
 											if (data[1].equals("null") == false)
 											{
 												broadcast("connect" + ds + users.get(clientID));
-												chatlog.append("[" + getTime() + "]  -" + 
-												users.get(clientID) + " connected to the server-\n");
+												chatlog.append("[" + getTime() + "]  --" + 
+												users.get(clientID) + " connected to the server--\n");
+												consoleArea.append("[" + getTime() + "]  --" + 
+												users.get(clientID) + " connected to the server--\n");
 											}
 											if (isAdmin(data[1]))
 												addAdmin(data[1]);
@@ -230,8 +242,10 @@ public class Server extends JFrame
 							if (data[1].equals("null") == false)
 							{
 								broadcast("disconnect" + ds + "</font>" + users.get(clientID));
-								chatlog.append("[" + getTime() + "]  -" + 
-										users.get(clientID) + " disconnected from the server-\n");
+								chatlog.append("[" + getTime() + "]  --" + 
+										users.get(clientID) + " disconnected from the server--\n");
+								consoleArea.append("[" + getTime() + "]  --" + 
+										users.get(clientID) + " disconnected from the server--\n");
 							}
 							clientIDs.remove(clientID);
 							clientOutputStreams.get(clientID).close();
@@ -257,8 +271,16 @@ public class Server extends JFrame
 									//Debug info that displays the
 									//exact data recieved from the client.
 									String[] args = data[2].split(" ");
-									for (int i = 0; i < args.length; i++)
-										consoleArea.append("Data recieved: " + args[i] + "\n");
+									if (debugging)
+										for (int i = 0; i < args.length; i++)
+											consoleArea.append("Data recieved: " + args[i] + "\n");
+									else
+									{
+										consoleArea.append("[" + getTime() + "]  " +
+													data[1] + " executed command: " + data[2] + "\n");
+										chatlog.append("[" + getTime() + "]  " +
+												data[1] + " executed command: " + data[2] + "\n");
+									}
 									
 									//ADMIN COMMANDS
 									if (checkAdminCommands(clientID, args));
@@ -267,7 +289,7 @@ public class Server extends JFrame
 									else if (checkNonAdminCommands(clientID, args));
 									
 									//SHARED COMMANDS
-									else if (checkSharedCommands(clientID, args));
+									else if (checkSharedCommands(clientID, data[1], args));
 									
 									else
 										pmUser(clientID, "<font color = red>Invalid command.</font>");
@@ -301,6 +323,7 @@ public class Server extends JFrame
 									}
 									
 									chatlog.append("[" + getTime() + "]  " + data[1] + ": " + data[2] + "\n");
+									consoleArea.append("[" + getTime() + "]  " + data[1] + ": " + data[2] + "\n");
 								}
 							}
 							else
@@ -382,20 +405,23 @@ public class Server extends JFrame
 									{
 										writer.println("response" + ds + "login" + ds + "Success");
 										writer.flush();
-										consoleArea.append("Sent response success to client " + clientID + ". \n");
+										if (debugging)
+											consoleArea.append("Sent response success to client " + clientID + ". \n");
 									}
 									else
 									{
 										writer.println("response" + ds + "login" + ds + "Account in use");
 										writer.flush();
-										consoleArea.append("Sent response success to client " + clientID + ". \n");
+										if (debugging)
+											consoleArea.append("Sent response success to client " + clientID + ". \n");
 									}
 								}
 								else
 								{
 									writer.println("response" + ds + "login" + ds + "Incorrent login");
 									writer.flush();
-									consoleArea.append("Sent response incorrect to client " + clientID + ". \n");
+									if (debugging)
+										consoleArea.append("Sent response incorrect to client " + clientID + ". \n");
 								}
 							}
 							
@@ -410,8 +436,16 @@ public class Server extends JFrame
 							{
 								ArrayList<String> usernamesList = readAccountsList("username");
 								if (usernamesList.contains(data[2]))
+								{
 									if (usernamesList.contains(data[3]) == false)
+									{
 										editAccountsFile("username", data[2], data[3]);
+										consoleArea.append("[" + getTime() + "]  --" +
+												data[2] + " changed their username to " + data[3] + "--\n");
+										chatlog.append("[" + getTime() + "]  --" +
+												data[2] + " changed their username to " + data[3] + "--\n");
+									}
+								}
 							}
 							else if (data[1].equals("password"))
 							{
@@ -424,6 +458,10 @@ public class Server extends JFrame
 										(usernamesList.indexOf(data[2])) == (passwordsList.indexOf(data[3])))
 								{
 									editAccountsFile("password", data[2], data[4]);
+									consoleArea.append("[" + getTime() + "]  --" +
+											data[2] + " changed their password--\n");
+									chatlog.append("[" + getTime() + "]  --" +
+											data[2] + " changed their password--\n");
 								}
 							}
 						}
@@ -432,7 +470,8 @@ public class Server extends JFrame
 					{
 						if (clientSocket.isClosed() == false)
 						{
-							consoleArea.append("ERROR: Failed to read a client's data. \n");
+							if (debugging)
+								consoleArea.append("[" + getTime() + "]  ERROR: Failed to read a client's data. \n");
 							chatlog.append("[" + getTime() + "]  ERROR: Failed to read a client's data.\n");
 							e.printStackTrace();
 						}
@@ -592,7 +631,7 @@ public class Server extends JFrame
     //Checks for commands that don't require admin or non-admin.
     //(Will run for admin and non admins.)
     //Returns true to be marked as a valid command.
-	private boolean checkSharedCommands(int clientID, String[] args)
+	private boolean checkSharedCommands(int clientID, String username, String[] args)
 	{
 		if (args[0].equalsIgnoreCase("/pm"))
 		{
@@ -602,8 +641,7 @@ public class Server extends JFrame
 				{
 					String message = "";
 					for (int i = 2; i < args.length; i++) message += (args[i] + " ");
-					pmOtherUser(clientID, args[1], message);
-					pmUser(clientID, message);
+					pmOtherUser(clientID, username, args[1], message);
 				}
 				else
 					pmUser(clientID, "</font><font color = red>That user does not exist.</font>");
@@ -775,7 +813,8 @@ public class Server extends JFrame
 				count++;
 			}
 		}
-		consoleArea.append("Sent message to " + count + " clients. \n");
+		if (debugging)
+			consoleArea.append("Sent message to " + count + " clients. \n");
 	}
 	
     //Sends the specified message to the specified user.
@@ -785,14 +824,15 @@ public class Server extends JFrame
 		PrintWriter writer = clientOutputStreams.get(clientID);
 		writer.println("chat" + ds + "</font><font color = \"red\">SERVER" + ds + "</font>" + message + "</font>");
 		writer.flush();
-		consoleArea.append("Sent message from " + clientID + " to client " + clientID + "\n");
+		if (debugging)
+			consoleArea.append("Sent message from " + clientID + " to client " + clientID + "\n");
 	}
 	
     //Send the specified message to the specified user from the specified client.
     //Used in the "pm" command. Could also be used to "impersonate" someone.
-	private void pmOtherUser(int clientID, String username, String message)
+	private void pmOtherUser(int clientID, String thisplayerusername, String otherplayerusername, String message)
 	{
-		int otherClientID = (int)users.get(username);
+		int otherClientID = (int)users.get(otherplayerusername);
 		PrintWriter writer = clientOutputStreams.get(otherClientID);
 		PrintWriter thisClientWriter = clientOutputStreams.get(clientID);
 		
@@ -808,6 +848,9 @@ public class Server extends JFrame
 						message.substring(index + word.length(), message.length());
 			}
 		}
+		
+		consoleArea.append("[" + getTime() + "]  " + "[PM] (" + thisplayerusername + " -> " +
+								otherplayerusername + "): " + message + "\n");
 		
 		if (data[2].contains("<font color"))
 		{
@@ -832,7 +875,9 @@ public class Server extends JFrame
 					"</font><font color = black>" + message + "</font>");
 		}
 		writer.flush();
-		consoleArea.append("Sent message from " + clientID + " to client " + otherClientID + "\n");
+		thisClientWriter.flush();
+		if (debugging)
+			consoleArea.append("Sent message from " + clientID + " to client " + otherClientID + "\n");
 	}
 	
 	//Returns the HTML formatted prefix string for the specified user.
@@ -859,7 +904,8 @@ public class Server extends JFrame
 	{
 		for (int i = 0; i < clientOutputStreams.size(); i++)
 		{
-			if (clientIDs.containsKey(i)) broadcast("disconnect" + ds + "</font>" + users.get(i));
+			if (clientIDs.containsKey(i))
+				broadcast("disconnect" + ds + "</font>" + users.get(i));
 			clientOutputStreams.get(i).close();
 			try 
 				{ clientSockets.get(i).close(); } 
@@ -1038,8 +1084,9 @@ public class Server extends JFrame
 					PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 					
 					clientOutputStreams.add(writer);
-					consoleArea.append("Got a connection. Connecting client #" + 
-									  (clientOutputStreams.size() -1) + "\n");
+					if (debugging)
+						consoleArea.append("Got a connection. Connecting client #" + 
+									  	(clientOutputStreams.size() -1) + "\n");
 					clientThreads.add(new Thread(new Listener(clientOutputStreams.size() - 1, 
 															clientSocket, writer)));
 					clientThreads.get(clientThreads.size() - 1).start();
@@ -1120,6 +1167,9 @@ public class Server extends JFrame
 		consoleArea.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		scrollPane.setViewportView(consoleArea);
 		
+		btnDebugging = new JButton("Turn Debugging ON");
+		contentPane.add(btnDebugging, "cell 1 2,alignx left");
+		
 		txtAdminName = new JTextField();
 		txtAdminName.setEnabled(false);
 		contentPane.add(txtAdminName, "cell 2 2,growx");
@@ -1138,7 +1188,7 @@ public class Server extends JFrame
 		
 		txtPort = new JTextField();
 		txtPort.setText("5555");
-		contentPane.add(txtPort, "cell 0 3 2 1");
+		contentPane.add(txtPort, "cell 0 3");
 		txtPort.setColumns(10);
 		
 		
@@ -1156,25 +1206,28 @@ public class Server extends JFrame
 					stopServer();
 				consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
 				
-				JOptionPane savelog = new JOptionPane();
-				int option = savelog.showConfirmDialog(Server.this, 
-						"Would you like to save the log from this session?", 
-						"Save Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-				
-				if (option == 0)
+				if (chatlog.length() > 0)
 				{
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-					LocalDate localDate = LocalDate.now();
-					try
+					JOptionPane savelog = new JOptionPane();
+					int option = savelog.showConfirmDialog(Server.this, 
+							"Would you like to save the log from this session?", 
+							"Save Log", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+					
+					if (option == 0)
 					{
-						BufferedWriter writer = new BufferedWriter(new FileWriter(
-								new File("Server Log [" + dtf.format(localDate) + "]")));
-						writer.write(chatlog.toString());
-						writer.close();
-					}
-					catch (IOException e1)
-					{
-						e1.printStackTrace();
+						DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+						LocalDate localDate = LocalDate.now();
+						try
+						{
+							BufferedWriter writer = new BufferedWriter(new FileWriter(
+									new File("Server Log [" + dtf.format(localDate) + "]")));
+							writer.write(chatlog.toString());
+							writer.close();
+						}
+						catch (IOException e1)
+						{
+							e1.printStackTrace();
+						}
 					}
 				}
 			}
@@ -1210,6 +1263,23 @@ public class Server extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				addAdmin(txtAdminName.getText());
+			}
+		});
+		
+		btnDebugging.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (debugging)
+				{
+					debugging = false;
+					btnDebugging.setText("Turn Debugging ON");
+				}
+				else
+				{
+					debugging = true;
+					btnDebugging.setText("Turn Debugging OFF");
+				}
 			}
 		});
 		
