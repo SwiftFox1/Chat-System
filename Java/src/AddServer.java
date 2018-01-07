@@ -87,7 +87,8 @@ public class AddServer extends JFrame
 			String data = name + " (" + ip + ":" + port + ")\n";
 			try
 			{
-				File file = new File("/Java Program Data/SwiftChat/servers.dat");
+				String home = System.getProperty("user.home");
+				File file = new File(home + "/Java Program Data/SwiftChat/servers.dat");
 				file.getParentFile().mkdirs();
 				if (!file.exists())
 					file.createNewFile();

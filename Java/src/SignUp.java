@@ -125,7 +125,8 @@ public class SignUp extends JFrame
 		
 		try
 		{
-			File file = new File("/Java Program Data/SwiftChat/servers.dat");
+			String home = System.getProperty("user.home");
+			File file = new File(home + "/Java Program Data/SwiftChat/servers.dat");
 			file.getParentFile().mkdirs();
 			if (!file.exists())
 				file.createNewFile();
@@ -293,7 +294,7 @@ public class SignUp extends JFrame
 						(txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0))
 					createError("Select a server before logging in!");
 				//Username and password fields are not filled out.
-				else if (txtUsername.getText().length() == 0 && txtPassword.getText().length() == 0)
+				else if (txtUsername.getText().length() == 0 || txtPassword.getText().length() == 0)
 					createError("Fill out all fields before logging in.");
 			}
 		});
@@ -331,8 +332,8 @@ public class SignUp extends JFrame
 				}
 				else if (item != "Select A Server...")
 				{
-					savedIP = item.substring(item.indexOf('-') + 1, item.indexOf(':'));
-					savedPort = Integer.parseInt(item.substring(item.indexOf(':') + 1, item.length()));
+					savedIP = item.substring(item.indexOf('(') + 1, item.indexOf(':'));
+					savedPort = Integer.parseInt(item.substring(item.indexOf(':') + 1, item.indexOf(')')));
 				}
 				else
 				{

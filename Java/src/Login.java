@@ -125,7 +125,8 @@ public class Login extends JFrame
 		
 		try
 		{
-			File file = new File("/Java Program Data/SwiftChat/servers.dat");
+			String home = System.getProperty("user.home");
+			File file = new File(home + "/Java Program Data/SwiftChat/servers.dat");
 			file.getParentFile().mkdirs();
 			if (!file.exists())
 				file.createNewFile();
